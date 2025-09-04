@@ -1,0 +1,9 @@
+# core UI / data 
+streamlit==1.36.0
+pandas==2.2.2
+numpy==1.26.4
+
+# HTTP / .env 
+requests==2.32.3
+python-dotenv==1.0.1
+
