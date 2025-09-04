@@ -305,9 +305,7 @@ def ten_day_buckets(daily_df: pd.DataFrame) -> pd.DataFrame:
 # --- 販売数らしい列を推定 ---
 def guess_sales_column(df: pd.DataFrame) -> Optional[str]:
     """
-    結合テーブルから「売れた個数」に該当しそうな列名を推定して返す。
-    1) 優先候補の完全一致を数値列から探索 → 2) 日本語の含意（売/販/出荷 × 数/個/量）
-       → 3) それでも無ければ、天気列を除いた最初の数値列
+    結合テーブルから個数に該当する列名を推定して返す。
     """
     if df is None or df.empty:
         return None
@@ -321,11 +319,7 @@ def guess_sales_column(df: pd.DataFrame) -> Optional[str]:
     if not numeric_cols:
         return None
 
-    priority = [
-        "売れた個数", "売上個数", "販売個数", "販売数量", "売上数", "販売数",
-        "個数", "数量",
-        "units_sold", "qty_sold", "sold", "sales_qty", "sales", "出荷数",
-    ]
+    priority = ["売れた個数"]
 
     lower_map = {c: str(c).lower() for c in numeric_cols}
     for name in priority:
