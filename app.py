@@ -107,7 +107,7 @@ def draw_overlaid_chart(daily: pd.DataFrame) -> None:
         layers.append({
             "mark": {"type": "line", "strokeDash": [4, 2]},
             "encoding": {"y": {"field": "humidity", "type": "quantitative",
-                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 40}}},
+                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 60}}},
         })
 
     if not layers:
@@ -126,7 +126,7 @@ def draw_overlaid_chart(daily: pd.DataFrame) -> None:
         "resolve": {"scale": {"y": "independent"}},
         "config": {"axis": {"labelFontSize": 11, "titleFontSize": 12}, "legend": {"labelFontSize": 11, "titleFontSize": 12}},
     }
-    st.subheader("重ねて表示（気温・湿度・降水）")
+    st.subheader("重ねて表示（気温・湿度・降水量）")
     st.vega_lite_chart(df, spec, use_container_width=True)
 
 
@@ -159,7 +159,7 @@ def draw_ten_day_chart(ten_df: pd.DataFrame) -> None:
         layers.append({
             "mark": {"type": "line", "strokeDash": [4, 2]},
             "encoding": {"y": {"field": "humidity", "type": "quantitative",
-                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 40}}}
+                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 60}}}
         })
 
     tooltip = [{"field": "bucket", "type": "nominal", "title": "区間"}]
@@ -176,17 +176,17 @@ def draw_ten_day_chart(ten_df: pd.DataFrame) -> None:
         "resolve": {"scale": {"y": "independent"}},
         "config": {"axis": {"labelFontSize": 11, "titleFontSize": 12}, "legend": {"labelFontSize": 11, "titleFontSize": 12}},
     }
-    st.subheader("10日ごとに重ねて表示（気温・湿度・降水）")
+    st.subheader("10日ごとに重ねて表示（気温・湿度・降水量）")
     st.vega_lite_chart(df, spec, use_container_width=True)
 
 
 # ==============================
-# 修正：販売×天気（販売＝赤線、降水＝棒）
+# 修正：販売×天気（販売＝赤線、降水量＝棒）
 # ==============================
 def draw_sales_weather_chart(joined: pd.DataFrame, sales_col: str) -> None:
     """
     左軸: 売れた個数（赤・実線の折れ線）
-    右軸(0px): 降水（棒）
+    右軸(0px): 降水量（棒）
     右軸(40px): 湿度（破線）
     右軸(80px): 気温（折れ線）
     """
@@ -215,26 +215,26 @@ def draw_sales_weather_chart(joined: pd.DataFrame, sales_col: str) -> None:
         layers.append({
             "mark": {"type": "line", "strokeDash": [4, 2]},
             "encoding": {"y": {"field": "humidity", "type": "quantitative",
-                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 40}}}
+                               "axis": {"title": "湿度 (%)", "orient": "right", "offset": 50}}}
         })
     # 気温＝線（右軸80px）
     if has_temp:
         layers.append({
             "mark": {"type": "line"},
             "encoding": {"y": {"field": "temp", "type": "quantitative",
-                               "axis": {"title": "気温 (℃)", "orient": "right", "offset": 80}}}
+                               "axis": {"title": "気温 (℃)", "orient": "right", "offset": 110}}}
         })
     # 売れた個数＝赤い実線（最前面・左軸）
     layers.append({
         "mark": {"type": "line", "strokeWidth": 2},
         "encoding": {
-            "y": {"field": sales_col, "type": "quantitative", "axis": {"title": "売れた個数"}},
+            "y": {"field": sales_col, "type": "quantitative", "axis": {"title": "商品個数"}},
             "color": {"value": "red"},
         },
     })
 
     tooltip = [{"field": "date", "type": "temporal", "title": "日付"},
-               {"field": sales_col, "type": "quantitative", "title": "売れた個数"}]
+               {"field": sales_col, "type": "quantitative", "title": "商品個数"}]
     if has_temp: tooltip.append({"field": "temp", "type": "quantitative", "title": "気温(℃)", "format": ".1f"})
     if has_hum:  tooltip.append({"field": "humidity", "type": "quantitative", "title": "湿度(%)", "format": ".0f"})
     if has_prcp: tooltip.append({"field": "precip", "type": "quantitative", "title": "降水量(mm)", "format": ".1f"})
@@ -246,14 +246,15 @@ def draw_sales_weather_chart(joined: pd.DataFrame, sales_col: str) -> None:
         "resolve": {"scale": {"y": "independent"}},
         "config": {"axis": {"labelFontSize": 11, "titleFontSize": 12}, "legend": {"labelFontSize": 11, "titleFontSize": 12}},
     }
-    st.subheader("販売と天気の関係（売れた個数 × 気温・湿度・降水）")
+    st.subheader("販売と天気の関係（商品個数 × 気温・湿度・降水量）")
     st.vega_lite_chart(df, spec, use_container_width=True)
 
 
 def main():
     st.set_page_config(page_title="Weather Demo: 日別集計＋在庫結合", layout="wide")
-    st.title("天気・気温・湿度（日別集計）＋ 在庫結合（任意）")
-
+    st.title("気温・湿度・降水量（日別集計）＋ 在庫結合（任意）")
+    st.caption("日別/10日別の天気集計と商品在庫を、表・グラフで確認できます。")
+    st.caption("グラフにおいて、気温（青・実線）／湿度（青・点線）／降水量（青・棒）／商品個数（赤・実線）")
     load_dotenv()  # .env があれば読み込む
 
     # --- セッション状態の初期化（選択変更で再描画できるように） ---
